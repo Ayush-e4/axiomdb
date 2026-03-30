@@ -277,20 +277,10 @@ graph LR
 
 ## 📊 Comparison
 
-```
-┌──────────────────────────────────────────────────────┐
-│                   Setup Complexity                    │
-├──────────────────────────────────────────────────────┤
-│                                                      │
-│  Redis + Celery  ████████████████████████████  100%  │
-│                  Docker, broker, backend,            │
-│                  monitoring, config files             │
-│                                                      │
-│  axiomdb           ██                            5%    │
-│                  pip install axiomdb                    │
-│                                                      │
-└──────────────────────────────────────────────────────┘
-```
+| Stack | Relative setup complexity | What you need |
+|---|---:|---|
+| Redis + Celery | 100% | Docker, broker, result backend, monitoring, config files |
+| axiomdb | 5% | `pip install axiomdb` |
 
 <br>
 
