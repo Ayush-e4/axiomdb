@@ -3,7 +3,7 @@ import time
 
 import pytest
 
-from axiom import Queue, Scheduler, task
+from noredis import Queue, Scheduler, task
 
 DB = "test_scheduler.db"
 

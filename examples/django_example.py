@@ -1,13 +1,13 @@
 """
-Axiom + Django example
+NoRedis + Django example
 ======================
 
 Drop-in caching and background jobs for any Django project.
 
 Setup:
-    1. pip install django axiom
+    1. pip install django noredis
     2. Add this to your Django app's views.py (or a dedicated tasks.py)
-    3. Initialize axiom in your AppConfig.ready() method
+    3. Initialize noredis in your AppConfig.ready() method
 
 This example shows the patterns — adapt paths and imports to your project structure.
 """
@@ -15,11 +15,11 @@ This example shows the patterns — adapt paths and imports to your project stru
 # ── tasks.py ────────────────────────────────────────────────────
 # Create this file in your Django app directory.
 
-from axiom import Cache, Queue, Scheduler, task
+from noredis import Cache, Queue, Scheduler, task
 
 # Single database file, shared across your entire Django project.
-cache = Cache("axiom.db")
-queue = Queue("axiom.db")
+cache = Cache("noredis.db")
+queue = Queue("noredis.db")
 
 
 @task
@@ -54,7 +54,7 @@ def generate_report(payload):
 #         queue.start_worker(concurrency=4)
 #
 #         # Optional: schedule recurring tasks
-#         from axiom import Scheduler
+#         from noredis import Scheduler
 #         from myapp.tasks import generate_report
 #         scheduler = Scheduler(queue)
 #         scheduler.every(generate_report, seconds=3600, payload={"type": "daily"})
@@ -62,7 +62,7 @@ def generate_report(payload):
 
 
 # ── views.py ────────────────────────────────────────────────────
-# Example views using axiom for caching and job dispatch.
+# Example views using noredis for caching and job dispatch.
 
 # from django.http import JsonResponse
 # from myapp.tasks import cache, queue, send_welcome_email, generate_report

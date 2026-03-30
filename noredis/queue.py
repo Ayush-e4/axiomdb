@@ -44,7 +44,7 @@ class Queue:
         queue.start_worker(concurrency=2)
     """
 
-    def __init__(self, db_path: str = "axiom.db"):
+    def __init__(self, db_path: str = "noredis.db"):
         self.db_path = db_path
         self._running = False
         self._threads: list[threading.Thread] = []
@@ -60,7 +60,7 @@ class Queue:
         func_name = getattr(func, "_task_name", None)
         if func_name is None:
             raise ValueError(
-                f"{func.__name__} must be decorated with @task or registered via axiom.register()"
+                f"{func.__name__} must be decorated with @task or registered via noredis.register()"
             )
         scheduled_at = run_at or (time.time() + delay)
         conn = get_conn(self.db_path)

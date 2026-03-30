@@ -1,4 +1,4 @@
-# Contributing to Axiom
+# Contributing to NoRedis
 
 Thanks for your interest in contributing! Here's how to get started.
 
@@ -6,8 +6,8 @@ Thanks for your interest in contributing! Here's how to get started.
 
 ```bash
 # Clone and install
-git clone https://github.com/Ayush-e4/axiom.git
-cd axiom
+git clone https://github.com/Ayush-e4/noredis.git
+cd noredis
 python3 -m venv venv
 source venv/bin/activate
 pip install -e ".[dev]"
@@ -57,9 +57,9 @@ When reporting a bug, please include:
 
 ## Design Principles
 
-Axiom is intentionally minimal. Before proposing a new feature, consider:
+NoRedis is intentionally minimal. Before proposing a new feature, consider:
 
-- **Does it require zero external dependencies?** Axiom ships with only the Python standard library.
+- **Does it require zero external dependencies?** NoRedis ships with only the Python standard library.
 - **Does it work with a single SQLite file?** No Redis, no Postgres, no network.
 - **Is it useful for the 90% use case?** We're not trying to replace Redis for high-throughput distributed systems.
 

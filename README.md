@@ -1,18 +1,18 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="axiom" width="100%">
+  <img src="assets/banner.svg" alt="noredis" width="100%">
 </p>
 
 <p align="center">
-  <a href="https://github.com/Ayush-e4/axiom/actions/workflows/test.yml"><img src="https://github.com/Ayush-e4/axiom/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
-  <a href="https://pypi.org/project/axiom-db/"><img src="https://img.shields.io/pypi/v/axiom-db?style=flat-square&color=f7971e&label=pypi" alt="PyPI"></a>
-  <a href="https://pypi.org/project/axiom-db/"><img src="https://img.shields.io/pypi/pyversions/axiom-db?style=flat-square&color=a8edea" alt="Python"></a>
-  <a href="https://github.com/Ayush-e4/axiom/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Ayush-e4/axiom?style=flat-square&color=fed6e3" alt="License"></a>
-  <a href="https://github.com/Ayush-e4/axiom"><img src="https://img.shields.io/github/stars/Ayush-e4/axiom?style=flat-square&color=f9e2af" alt="Stars"></a>
+  <a href="https://github.com/Ayush-e4/noredis/actions/workflows/test.yml"><img src="https://github.com/Ayush-e4/noredis/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
+  <a href="https://pypi.org/project/noredis-db/"><img src="https://img.shields.io/pypi/v/noredis-db?style=flat-square&color=f7971e&label=pypi" alt="PyPI"></a>
+  <a href="https://pypi.org/project/noredis-db/"><img src="https://img.shields.io/pypi/pyversions/noredis-db?style=flat-square&color=a8edea" alt="Python"></a>
+  <a href="https://github.com/Ayush-e4/noredis/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Ayush-e4/noredis?style=flat-square&color=fed6e3" alt="License"></a>
+  <a href="https://github.com/Ayush-e4/noredis"><img src="https://img.shields.io/github/stars/Ayush-e4/noredis?style=flat-square&color=f9e2af" alt="Stars"></a>
 </p>
 
 <p align="center">
   <b>Cache · Queue · Scheduler — all in a single SQLite file.</b><br>
-  <sub>Zero servers. Zero config. Zero dependencies. Just <code>pip install axiom</code>.</sub>
+  <sub>Zero servers. Zero config. Zero dependencies. Just <code>pip install noredis</code>.</sub>
 </p>
 
 ---
@@ -73,11 +73,11 @@ The standard answer? Spin up **Redis** + **Celery**. That's 2 extra services, Do
 <td width="50%">
 
 ### 🛠️ CLI
-- `axiom stats` — cache & queue overview
-- `axiom jobs` — list/filter jobs by status
-- `axiom inspect <id>` — deep-dive a job
-- `axiom retry` — retry failed jobs
-- `axiom purge` — clean up done/failed
+- `noredis stats` — cache & queue overview
+- `noredis jobs` — list/filter jobs by status
+- `noredis inspect <id>` — deep-dive a job
+- `noredis retry` — retry failed jobs
+- `noredis purge` — clean up done/failed
 
 </td>
 </tr>
@@ -88,13 +88,13 @@ The standard answer? Spin up **Redis** + **Celery**. That's 2 extra services, Do
 ## 🚀 Quick Start
 
 ```bash
-pip install axiom-db
+pip install noredis-db
 ```
 
 > **Requirements:** Python 3.10+ · No external dependencies — just the standard library.
 
 ```python
-from axiom import Cache, Queue, Scheduler, task
+from noredis import Cache, Queue, Scheduler, task
 
 cache = Cache("app.db")
 queue = Queue("app.db")
@@ -138,7 +138,7 @@ scheduler.start()
 
 ```python
 from fastapi import FastAPI, HTTPException
-from axiom import Cache, Queue, task
+from noredis import Cache, Queue, task
 
 app = FastAPI()
 cache = Cache("app.db")
@@ -200,16 +200,16 @@ queue.stats()               # {"done": 1247, "pending": 3, "failed": 1}
 ## 🖥️ CLI Dashboard
 
 <p align="center">
-  <img src="assets/terminal-demo.svg" alt="axiom CLI" width="100%">
+  <img src="assets/terminal-demo.svg" alt="noredis CLI" width="100%">
 </p>
 
 ```bash
-axiom --db app.db stats            # cache & queue overview
-axiom --db app.db jobs -s failed   # list failed jobs with traces
-axiom --db app.db inspect 42       # deep-dive into any job
-axiom --db app.db retry --all      # retry all dead-lettered jobs
-axiom --db app.db purge -y         # delete completed & failed jobs
-axiom --db app.db flush            # clear all cache entries
+noredis --db app.db stats            # cache & queue overview
+noredis --db app.db jobs -s failed   # list failed jobs with traces
+noredis --db app.db inspect 42       # deep-dive into any job
+noredis --db app.db retry --all      # retry all dead-lettered jobs
+noredis --db app.db purge -y         # delete completed & failed jobs
+noredis --db app.db flush            # clear all cache entries
 ```
 
 <br>
@@ -224,7 +224,7 @@ graph LR
         D[Scheduler] -->|enqueue on interval| C
     end
 
-    subgraph axiom internals
+    subgraph noredis internals
         B -->|L1 hit| E[In-Memory Dict]
         B -->|L1 miss| F[(SQLite WAL)]
         C -->|claim job| F
@@ -271,7 +271,7 @@ graph LR
 | Pub/sub fan-out to many consumers | Redis |
 | Distributed across data centers | Redis Cluster |
 
-> **For everything else** — one server, reasonable load, a few hundred users — **axiom is fine forever.**
+> **For everything else** — one server, reasonable load, a few hundred users — **noredis is fine forever.**
 
 <br>
 
@@ -286,8 +286,8 @@ graph LR
 │                  Docker, broker, backend,            │
 │                  monitoring, config files             │
 │                                                      │
-│  axiom           ██                            5%    │
-│                  pip install axiom                    │
+│  noredis           ██                            5%    │
+│                  pip install noredis                    │
 │                                                      │
 └──────────────────────────────────────────────────────┘
 ```
@@ -299,8 +299,8 @@ graph LR
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a PR.
 
 ```bash
-git clone https://github.com/Ayush-e4/axiom.git
-cd axiom
+git clone https://github.com/Ayush-e4/noredis.git
+cd noredis
 pip install -e ".[dev]"
 pytest tests/
 ```

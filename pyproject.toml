@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "axiom"
+name = "noredis"
 version = "0.1.0"
 description = "Redis + Celery replacement. Cache, Queue, Scheduler — backed by SQLite. Zero servers."
 readme = "README.md"
@@ -37,18 +37,18 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Ayush-e4/axiom"
-Documentation = "https://github.com/Ayush-e4/axiom#readme"
-Repository = "https://github.com/Ayush-e4/axiom"
-Issues = "https://github.com/Ayush-e4/axiom/issues"
-Changelog = "https://github.com/Ayush-e4/axiom/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/Ayush-e4/noredis"
+Documentation = "https://github.com/Ayush-e4/noredis#readme"
+Repository = "https://github.com/Ayush-e4/noredis"
+Issues = "https://github.com/Ayush-e4/noredis/issues"
+Changelog = "https://github.com/Ayush-e4/noredis/blob/main/CHANGELOG.md"
 
 [project.scripts]
-axiom = "axiom.cli:main"
+noredis = "noredis.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["axiom*"]
+include = ["noredis*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -74,4 +74,4 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["axiom"]
+known-first-party = ["noredis"]

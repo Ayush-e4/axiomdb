@@ -20,8 +20,8 @@ We will respond within 48 hours and work with you to understand and address the 
 
 ## Security Considerations
 
-Axiom stores data in a local SQLite file. Keep in mind:
+NoRedis stores data in a local SQLite file. Keep in mind:
 
 - **The `.db` file is not encrypted.** Do not store secrets (API keys, passwords) in the cache without application-level encryption.
-- **SQLite files are local.** Axiom is designed for single-server deployments. Do not expose the database file over a network share.
+- **SQLite files are local.** NoRedis is designed for single-server deployments. Do not expose the database file over a network share.
 - **Pickle is used for serialization.** Cache values are serialized with Python's `pickle` module. Only cache data you trust — never load an untrusted `.db` file from an unknown source.

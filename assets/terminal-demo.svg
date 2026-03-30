@@ -20,7 +20,7 @@
   <circle cx="68" cy="21" r="7" fill="#a6e3a1"/>
 
   <!-- Title text -->
-  <text x="425" y="27" font-family="'SF Mono','Fira Code',monospace" font-size="13" fill="#6c7086" text-anchor="middle">axiom — terminal</text>
+  <text x="425" y="27" font-family="'SF Mono','Fira Code',monospace" font-size="13" fill="#6c7086" text-anchor="middle">noredis — terminal</text>
 
   <!-- Terminal content -->
   <g font-family="'SF Mono','Fira Code','JetBrains Mono',monospace" font-size="14">
@@ -28,7 +28,7 @@
     <!-- Command 1: stats -->
     <text x="24" y="75">
       <tspan fill="#a6e3a1">❯ </tspan>
-      <tspan fill="#cdd6f4">axiom --db app.db stats</tspan>
+      <tspan fill="#cdd6f4">noredis --db app.db stats</tspan>
     </text>
 
     <text x="24" y="105" fill="#89b4fa" font-size="13">── Cache ──────────────────────────────</text>
@@ -43,7 +43,7 @@
     <!-- Command 2: inspect -->
     <text x="24" y="285">
       <tspan fill="#a6e3a1">❯ </tspan>
-      <tspan fill="#cdd6f4">axiom --db app.db inspect 42</tspan>
+      <tspan fill="#cdd6f4">noredis --db app.db inspect 42</tspan>
     </text>
 
     <text x="24" y="315" fill="#89b4fa" font-size="13">── Job #42 ────────────────────────────</text>

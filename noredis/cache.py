@@ -15,7 +15,7 @@ class Cache:
         cache.get("key")
     """
 
-    def __init__(self, db_path: str = "axiom.db", namespace: str = "default",
+    def __init__(self, db_path: str = "noredis.db", namespace: str = "default",
                  max_size: int = 10_000, cleanup_interval: int = 300):
         self.db_path = db_path
         self.namespace = namespace

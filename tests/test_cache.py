@@ -3,7 +3,7 @@ import time
 
 import pytest
 
-from axiom import Cache
+from noredis import Cache
 
 DB = "test_cache.db"
 

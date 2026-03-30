@@ -64,7 +64,7 @@
   </g>
 
   <!-- Main title -->
-  <text x="200" y="155" font-family="'SF Mono', 'Fira Code', 'JetBrains Mono', monospace" font-size="72" font-weight="800" fill="url(#textGrad)" filter="url(#glow)" letter-spacing="-2">axiom</text>
+  <text x="200" y="155" font-family="'SF Mono', 'Fira Code', 'JetBrains Mono', monospace" font-size="72" font-weight="800" fill="url(#textGrad)" filter="url(#glow)" letter-spacing="-2">noredis</text>
 
   <!-- Tagline -->
   <text x="200" y="190" font-family="'Inter', 'SF Pro Display', -apple-system, sans-serif" font-size="17" fill="url(#accentGrad)" letter-spacing="0.5" opacity="0.9">Redis + Celery in a single SQLite file</text>
@@ -97,6 +97,6 @@
   </g>
 
   <!-- Bottom info -->
-  <text x="60" y="268" font-family="'SF Mono', monospace" font-size="13" fill="rgba(255,255,255,0.35)">pip install axiom</text>
+  <text x="60" y="268" font-family="'SF Mono', monospace" font-size="13" fill="rgba(255,255,255,0.35)">pip install noredis</text>
   <text x="840" y="268" font-family="'SF Mono', monospace" font-size="13" fill="rgba(255,255,255,0.25)" text-anchor="end">MIT License</text>
 </svg>
