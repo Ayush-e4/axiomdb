@@ -6,6 +6,7 @@ _connections: dict[str, sqlite3.Connection] = {}
 _locks: dict[str, threading.Lock] = {}
 _meta_lock = threading.Lock()
 
+
 def get_conn(path: str) -> sqlite3.Connection:
     """
     Get a shared SQLite connection for the given path.
@@ -27,9 +28,11 @@ def get_conn(path: str) -> sqlite3.Connection:
             _create_tables(conn)
     return _connections[path]
 
+
 def get_lock(path: str) -> threading.Lock:
     get_conn(path)  # ensure initialised
     return _locks[path]
+
 
 def _create_tables(conn: sqlite3.Connection):
     """Create all tables if they don't exist (idempotent)."""

@@ -1,11 +1,14 @@
 import json
-import time
 import threading
+import time
 import traceback
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
+
 from .db import get_conn, get_lock
 
 _registry: dict[str, Callable] = {}
+
 
 def task(fn: Callable) -> Callable:
     """Decorator to register a function as a callable task."""
@@ -13,6 +16,7 @@ def task(fn: Callable) -> Callable:
     _registry[key] = fn
     fn._task_name = key
     return fn
+
 
 def register(fn: Callable, name: str) -> Callable:
     """
@@ -52,11 +56,16 @@ class Queue:
 
     # ── Public API ──────────────────────────────────────────────
 
-    def enqueue(self, func: Callable, payload: Any = None, *,
-                priority: int = 0,
-                delay: float = 0,
-                max_attempts: int = 3,
-                run_at: Optional[float] = None) -> int:
+    def enqueue(
+        self,
+        func: Callable,
+        payload: Any = None,
+        *,
+        priority: int = 0,
+        delay: float = 0,
+        max_attempts: int = 3,
+        run_at: float | None = None,
+    ) -> int:
         func_name = getattr(func, "_task_name", None)
         if func_name is None:
             raise ValueError(
@@ -65,10 +74,13 @@ class Queue:
         scheduled_at = run_at or (time.time() + delay)
         conn = get_conn(self.db_path)
         with get_lock(self.db_path):
-            cur = conn.execute("""
+            cur = conn.execute(
+                """
                 INSERT INTO jobs (func_name, payload, priority, run_at, max_attempts)
                 VALUES (?, ?, ?, ?, ?)
-            """, (func_name, json.dumps(payload or {}), priority, scheduled_at, max_attempts))
+            """,
+                (func_name, json.dumps(payload or {}), priority, scheduled_at, max_attempts),
+            )
             conn.commit()
         return cur.lastrowid
 
@@ -83,8 +95,7 @@ class Queue:
             return
         self._running = True
         for _ in range(concurrency):
-            t = threading.Thread(target=self._worker_loop,
-                                 args=(poll_interval,), daemon=True)
+            t = threading.Thread(target=self._worker_loop, args=(poll_interval,), daemon=True)
             t.start()
             self._threads.append(t)
         w = threading.Thread(target=self._watchdog_loop, daemon=True)
@@ -93,16 +104,14 @@ class Queue:
     def stop_worker(self):
         self._running = False
 
-    def job_status(self, job_id: int) -> Optional[dict]:
+    def job_status(self, job_id: int) -> dict | None:
         conn = get_conn(self.db_path)
         row = conn.execute("SELECT * FROM jobs WHERE id = ?", (job_id,)).fetchone()
         return dict(row) if row else None
 
     def stats(self) -> dict:
         conn = get_conn(self.db_path)
-        rows = conn.execute(
-            "SELECT status, COUNT(*) as count FROM jobs GROUP BY status"
-        ).fetchall()
+        rows = conn.execute("SELECT status, COUNT(*) as count FROM jobs GROUP BY status").fetchall()
         return {row["status"]: row["count"] for row in rows}
 
     def dead_letters(self) -> list[dict]:
@@ -115,32 +124,41 @@ class Queue:
     def retry(self, job_id: int) -> bool:
         conn = get_conn(self.db_path)
         with get_lock(self.db_path):
-            cur = conn.execute("""
+            cur = conn.execute(
+                """
                 UPDATE jobs SET status = 'pending', attempts = 0, error = NULL,
                     run_at = ?, updated_at = ?
                 WHERE id = ? AND status = 'failed'
-            """, (time.time(), time.time(), job_id))
+            """,
+                (time.time(), time.time(), job_id),
+            )
             conn.commit()
         return cur.rowcount > 0
 
     # ── Worker internals ────────────────────────────────────────
 
-    def _claim_job(self) -> Optional[dict]:
+    def _claim_job(self) -> dict | None:
         """Atomically claim next pending job using a Python-level lock."""
         conn = get_conn(self.db_path)
         with get_lock(self.db_path):
-            row = conn.execute("""
+            row = conn.execute(
+                """
                 SELECT * FROM jobs
                 WHERE status = 'pending' AND run_at <= ?
                 ORDER BY priority DESC, run_at ASC
                 LIMIT 1
-            """, (time.time(),)).fetchone()
+            """,
+                (time.time(),),
+            ).fetchone()
             if row is None:
                 return None
-            conn.execute("""
+            conn.execute(
+                """
                 UPDATE jobs SET status = 'running', updated_at = ?
                 WHERE id = ?
-            """, (time.time(), row["id"]))
+            """,
+                (time.time(), row["id"]),
+            )
             conn.commit()
         return dict(row)
 
@@ -158,10 +176,13 @@ class Queue:
 
         if func is None:
             with get_lock(self.db_path):
-                conn.execute("""
+                conn.execute(
+                    """
                     UPDATE jobs SET status = 'failed', error = ?, updated_at = ?
                     WHERE id = ?
-                """, (f"Unknown task: {job['func_name']}", time.time(), job["id"]))
+                """,
+                    (f"Unknown task: {job['func_name']}", time.time(), job["id"]),
+                )
                 conn.commit()
             return
 
@@ -169,27 +190,36 @@ class Queue:
             payload = json.loads(job["payload"])
             func(payload)
             with get_lock(self.db_path):
-                conn.execute("""
+                conn.execute(
+                    """
                     UPDATE jobs SET status = 'done', updated_at = ? WHERE id = ?
-                """, (time.time(), job["id"]))
+                """,
+                    (time.time(), job["id"]),
+                )
                 conn.commit()
 
         except Exception as e:
             attempts = job["attempts"] + 1
             with get_lock(self.db_path):
                 if attempts >= job["max_attempts"]:
-                    conn.execute("""
+                    conn.execute(
+                        """
                         UPDATE jobs SET status = 'failed', attempts = ?,
                             error = ?, updated_at = ?
                         WHERE id = ?
-                    """, (attempts, traceback.format_exc(), time.time(), job["id"]))
+                    """,
+                        (attempts, traceback.format_exc(), time.time(), job["id"]),
+                    )
                 else:
-                    backoff = 2 ** attempts
-                    conn.execute("""
+                    backoff = 2**attempts
+                    conn.execute(
+                        """
                         UPDATE jobs SET status = 'pending', attempts = ?,
                             error = ?, run_at = ?, updated_at = ?
                         WHERE id = ?
-                    """, (attempts, str(e), time.time() + backoff, time.time(), job["id"]))
+                    """,
+                        (attempts, str(e), time.time() + backoff, time.time(), job["id"]),
+                    )
                 conn.commit()
 
     def _watchdog_loop(self):
@@ -199,10 +229,13 @@ class Queue:
                 conn = get_conn(self.db_path)
                 stuck_threshold = time.time() - 300
                 with get_lock(self.db_path):
-                    conn.execute("""
+                    conn.execute(
+                        """
                         UPDATE jobs SET status = 'pending', updated_at = ?
                         WHERE status = 'running' AND updated_at <= ?
-                    """, (time.time(), stuck_threshold))
+                    """,
+                        (time.time(), stuck_threshold),
+                    )
                     conn.commit()
             except Exception:
                 pass

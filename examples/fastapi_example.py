@@ -10,6 +10,7 @@ Run:
 """
 
 from fastapi import FastAPI, HTTPException
+
 from axiomdb import Cache, Queue, task
 
 app = FastAPI(title="AxiomDB FastAPI Demo")

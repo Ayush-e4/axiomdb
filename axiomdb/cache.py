@@ -1,46 +1,56 @@
-import json
+import contextlib
 import pickle
-import time
 import threading
-from typing import Any, Optional
+import time
+from typing import Any
+
 from .db import get_conn
+
 
 class Cache:
     """
     Redis-like cache backed by SQLite.
-    
+
     Usage:
         cache = Cache("app.db")
         cache.set("key", {"any": "value"}, ttl=60)
         cache.get("key")
     """
 
-    def __init__(self, db_path: str = "axiomdb.db", namespace: str = "default",
-                 max_size: int = 10_000, cleanup_interval: int = 300):
+    def __init__(
+        self,
+        db_path: str = "axiomdb.db",
+        namespace: str = "default",
+        max_size: int = 10_000,
+        cleanup_interval: int = 300,
+    ):
         self.db_path = db_path
         self.namespace = namespace
         self.max_size = max_size
-        self._l1: dict = {}          # in-memory L1 cache
+        self._l1: dict = {}  # in-memory L1 cache
         self._l1_lock = threading.Lock()
         get_conn(db_path)
         self._start_cleanup(cleanup_interval)
 
     # ── Public API ──────────────────────────────────────────────
 
-    def set(self, key: str, value: Any, ttl: Optional[int] = None, ex: Optional[int] = None) -> None:
+    def set(self, key: str, value: Any, ttl: int | None = None, ex: int | None = None) -> None:
         """Set a key. ttl/ex = seconds until expiry."""
         ttl = ttl or ex
         expires_at = time.time() + ttl if ttl else None
         blob = pickle.dumps(value)
 
         conn = get_conn(self.db_path)
-        conn.execute("""
+        conn.execute(
+            """
             INSERT INTO cache_entries (key, namespace, value, expires_at)
             VALUES (?, ?, ?, ?)
             ON CONFLICT(key, namespace) DO UPDATE SET
                 value = excluded.value,
                 expires_at = excluded.expires_at
-        """, (key, self.namespace, blob, expires_at))
+        """,
+            (key, self.namespace, blob, expires_at),
+        )
         conn.commit()
 
         with self._l1_lock:
@@ -60,10 +70,13 @@ class Cache:
 
         # SQLite check
         conn = get_conn(self.db_path)
-        row = conn.execute("""
+        row = conn.execute(
+            """
             SELECT value, expires_at FROM cache_entries
             WHERE key = ? AND namespace = ?
-        """, (key, self.namespace)).fetchone()
+        """,
+            (key, self.namespace),
+        ).fetchone()
 
         if row is None:
             return default
@@ -82,9 +95,12 @@ class Cache:
         with self._l1_lock:
             self._l1.pop((key, self.namespace), None)
         conn = get_conn(self.db_path)
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             DELETE FROM cache_entries WHERE key = ? AND namespace = ?
-        """, (key, self.namespace))
+        """,
+            (key, self.namespace),
+        )
         conn.commit()
         return cur.rowcount > 0
 
@@ -92,13 +108,16 @@ class Cache:
         """Check if key exists and is not expired."""
         return self.get(key) is not None
 
-    def ttl(self, key: str) -> Optional[float]:
+    def ttl(self, key: str) -> float | None:
         """Remaining TTL in seconds. None = no expiry. -1 = not found."""
         conn = get_conn(self.db_path)
-        row = conn.execute("""
+        row = conn.execute(
+            """
             SELECT expires_at FROM cache_entries
             WHERE key = ? AND namespace = ?
-        """, (key, self.namespace)).fetchone()
+        """,
+            (key, self.namespace),
+        ).fetchone()
         if row is None:
             return -1
         if row["expires_at"] is None:
@@ -106,7 +125,7 @@ class Cache:
         remaining = row["expires_at"] - time.time()
         return max(0.0, remaining)
 
-    def flush(self, namespace: Optional[str] = None) -> int:
+    def flush(self, namespace: str | None = None) -> int:
         """Clear all keys in namespace (or current namespace)."""
         ns = namespace or self.namespace
         with self._l1_lock:
@@ -122,12 +141,11 @@ class Cache:
         """Return cache statistics."""
         conn = get_conn(self.db_path)
         total = conn.execute(
-            "SELECT COUNT(*) FROM cache_entries WHERE namespace = ?",
-            (self.namespace,)
+            "SELECT COUNT(*) FROM cache_entries WHERE namespace = ?", (self.namespace,)
         ).fetchone()[0]
         expired = conn.execute(
             "SELECT COUNT(*) FROM cache_entries WHERE namespace = ? AND expires_at <= ?",
-            (self.namespace, time.time())
+            (self.namespace, time.time()),
         ).fetchone()[0]
         return {
             "namespace": self.namespace,
@@ -153,7 +171,7 @@ class Cache:
         """LRU-lite: just drop oldest half if over max_size."""
         if len(self._l1) > self.max_size:
             keys = list(self._l1.keys())
-            for k in keys[:len(keys) // 2]:
+            for k in keys[: len(keys) // 2]:
                 del self._l1[k]
 
     def _cleanup_expired(self):
@@ -164,12 +182,12 @@ class Cache:
 
     def _start_cleanup(self, interval: int):
         """Run cleanup in background thread."""
+
         def loop():
             while True:
                 time.sleep(interval)
-                try:
+                with contextlib.suppress(Exception):
                     self._cleanup_expired()
-                except Exception:
-                    pass
+
         t = threading.Thread(target=loop, daemon=True)
         t.start()

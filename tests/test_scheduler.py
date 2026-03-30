@@ -7,6 +7,7 @@ from axiomdb import Queue, Scheduler, task
 
 DB = "test_scheduler.db"
 
+
 @pytest.fixture(autouse=True)
 def cleanup():
     yield
@@ -32,6 +33,7 @@ def test_every_fires_multiple_times():
     time.sleep(2.5)
     # should fire at ~0.5s, ~1s, ~1.5s, ~2s — at least 3 times
     assert len(fired) >= 3
+
 
 def test_scheduler_stop():
     fired = []

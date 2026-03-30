@@ -15,7 +15,7 @@ This example shows the patterns — adapt paths and imports to your project stru
 # ── tasks.py ────────────────────────────────────────────────────
 # Create this file in your Django app directory.
 
-from axiomdb import Cache, Queue, Scheduler, task
+from axiomdb import Cache, Queue, task
 
 # Single database file, shared across your entire Django project.
 cache = Cache("axiomdb.db")

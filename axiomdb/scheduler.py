@@ -1,7 +1,9 @@
-import time
 import threading
-from typing import Callable, Optional
+import time
+from collections.abc import Callable
+
 from .queue import Queue
+
 
 class Scheduler:
     """
@@ -24,26 +26,30 @@ class Scheduler:
         self._jobs: list[dict] = []
         self._running = False
 
-    def every(self, func: Callable, seconds: float, payload: dict = None):
+    def every(self, func: Callable, seconds: float, payload: dict | None = None):
         """Run func every N seconds."""
-        self._jobs.append({
-            "func": func,
-            "type": "interval",
-            "seconds": seconds,
-            "payload": payload or {},
-            "last_run": 0,
-        })
+        self._jobs.append(
+            {
+                "func": func,
+                "type": "interval",
+                "seconds": seconds,
+                "payload": payload or {},
+                "last_run": 0,
+            }
+        )
 
-    def daily(self, func: Callable, hour: int = 0, minute: int = 0, payload: dict = None):
+    def daily(self, func: Callable, hour: int = 0, minute: int = 0, payload: dict | None = None):
         """Run func every day at HH:MM."""
-        self._jobs.append({
-            "func": func,
-            "type": "daily",
-            "hour": hour,
-            "minute": minute,
-            "payload": payload or {},
-            "last_run": 0,
-        })
+        self._jobs.append(
+            {
+                "func": func,
+                "type": "daily",
+                "hour": hour,
+                "minute": minute,
+                "payload": payload or {},
+                "last_run": 0,
+            }
+        )
 
     def start(self):
         """Start scheduler in background thread."""
@@ -56,6 +62,7 @@ class Scheduler:
 
     def _loop(self):
         import datetime
+
         while self._running:
             now = time.time()
             dt = datetime.datetime.now()
