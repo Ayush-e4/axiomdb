@@ -2,6 +2,7 @@ import contextlib
 import pickle
 import threading
 import time
+from collections import OrderedDict
 from typing import Any
 
 from .db import get_conn
@@ -27,7 +28,7 @@ class Cache:
         self.db_path = db_path
         self.namespace = namespace
         self.max_size = max_size
-        self._l1: dict = {}  # in-memory L1 cache
+        self._l1: OrderedDict[tuple[str, str], tuple[Any, float | None]] = OrderedDict()
         self._l1_lock = threading.Lock()
         get_conn(db_path)
         self._start_cleanup(cleanup_interval)
@@ -55,20 +56,20 @@ class Cache:
 
         with self._l1_lock:
             self._l1[(key, self.namespace)] = (value, expires_at)
+            self._l1.move_to_end((key, self.namespace))
             self._evict_l1_if_needed()
 
     def get(self, key: str, default: Any = None) -> Any:
         """Get a key. Returns default if missing or expired."""
-        # L1 check
         with self._l1_lock:
             entry = self._l1.get((key, self.namespace))
-            if entry:
+            if entry is not None:
                 value, expires_at = entry
                 if expires_at is None or expires_at > time.time():
+                    self._l1.move_to_end((key, self.namespace))
                     return value
                 del self._l1[(key, self.namespace)]
 
-        # SQLite check
         conn = get_conn(self.db_path)
         row = conn.execute(
             """
@@ -88,6 +89,8 @@ class Cache:
         value = pickle.loads(row["value"])
         with self._l1_lock:
             self._l1[(key, self.namespace)] = (value, row["expires_at"])
+            self._l1.move_to_end((key, self.namespace))
+            self._evict_l1_if_needed()
         return value
 
     def delete(self, key: str) -> bool:
@@ -106,7 +109,8 @@ class Cache:
 
     def exists(self, key: str) -> bool:
         """Check if key exists and is not expired."""
-        return self.get(key) is not None
+        sentinel = object()
+        return self.get(key, sentinel) is not sentinel
 
     def ttl(self, key: str) -> float | None:
         """Remaining TTL in seconds. None = no expiry. -1 = not found."""
@@ -168,11 +172,9 @@ class Cache:
     # ── Internals ───────────────────────────────────────────────
 
     def _evict_l1_if_needed(self):
-        """LRU-lite: just drop oldest half if over max_size."""
-        if len(self._l1) > self.max_size:
-            keys = list(self._l1.keys())
-            for k in keys[: len(keys) // 2]:
-                del self._l1[k]
+        """Evict least recently used items until the cache is back under max_size."""
+        while len(self._l1) > self.max_size:
+            self._l1.popitem(last=False)
 
     def _cleanup_expired(self):
         """Delete expired entries from SQLite."""

@@ -138,29 +138,41 @@ class Queue:
     # ── Worker internals ────────────────────────────────────────
 
     def _claim_job(self) -> dict | None:
-        """Atomically claim next pending job using a Python-level lock."""
+        """Atomically claim the next runnable job using a SQLite write transaction."""
+        now = time.time()
         conn = get_conn(self.db_path)
         with get_lock(self.db_path):
-            row = conn.execute(
-                """
-                SELECT * FROM jobs
-                WHERE status = 'pending' AND run_at <= ?
-                ORDER BY priority DESC, run_at ASC
-                LIMIT 1
-            """,
-                (time.time(),),
-            ).fetchone()
-            if row is None:
-                return None
-            conn.execute(
-                """
-                UPDATE jobs SET status = 'running', updated_at = ?
-                WHERE id = ?
-            """,
-                (time.time(), row["id"]),
-            )
-            conn.commit()
-        return dict(row)
+            conn.execute("BEGIN IMMEDIATE")
+            try:
+                row = conn.execute(
+                    """
+                    SELECT * FROM jobs
+                    WHERE status = 'pending' AND run_at <= ?
+                    ORDER BY priority DESC, run_at ASC
+                    LIMIT 1
+                """,
+                    (now,),
+                ).fetchone()
+                if row is None:
+                    conn.commit()
+                    return None
+
+                conn.execute(
+                    """
+                    UPDATE jobs SET status = 'running', updated_at = ?
+                    WHERE id = ?
+                """,
+                    (now, row["id"]),
+                )
+                conn.commit()
+            except Exception:
+                conn.rollback()
+                raise
+
+        claimed = dict(row)
+        claimed["status"] = "running"
+        claimed["updated_at"] = now
+        return claimed
 
     def _worker_loop(self, poll_interval: float):
         while self._running:

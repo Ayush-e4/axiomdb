@@ -1,3 +1,4 @@
+import multiprocessing
 import os
 import time
 
@@ -22,6 +23,16 @@ def queue():
     q = Queue(DB)
     q.start_worker(concurrency=2, poll_interval=0.1)
     return q
+
+
+def _claim_job_once(db_path: str, ready_queue, start_event, result_queue):
+    from axiomdb import Queue
+
+    queue = Queue(db_path)
+    ready_queue.put(True)
+    start_event.wait(timeout=5)
+    job = queue._claim_job()
+    result_queue.put(job["id"] if job else None)
 
 
 # ── Task registration ────────────────────────────────────────────
@@ -66,6 +77,47 @@ def test_job_status_done(queue):
 
 def test_job_status_unknown(queue):
     assert queue.job_status(99999) is None
+
+
+def test_claim_is_atomic_across_processes(tmp_path):
+    db_path = tmp_path / "atomic_claim.db"
+    queue = Queue(str(db_path))
+
+    def noop(payload):
+        pass
+
+    register(noop, "test_atomic_claim")
+    job_id = queue.enqueue(noop, {})
+
+    ctx = multiprocessing.get_context("spawn")
+    ready_queue = ctx.Queue()
+    result_queue = ctx.Queue()
+    start_event = ctx.Event()
+    processes = [
+        ctx.Process(
+            target=_claim_job_once,
+            args=(str(db_path), ready_queue, start_event, result_queue),
+        )
+        for _ in range(2)
+    ]
+
+    for process in processes:
+        process.start()
+
+    for _ in processes:
+        ready_queue.get(timeout=5)
+
+    start_event.set()
+    claimed_ids = [result_queue.get(timeout=5) for _ in processes]
+
+    for process in processes:
+        process.join(timeout=5)
+        if process.is_alive():
+            process.terminate()
+            process.join(timeout=5)
+
+    assert claimed_ids.count(job_id) == 1
+    assert claimed_ids.count(None) == 1
 
 
 # ── Priority ─────────────────────────────────────────────────────

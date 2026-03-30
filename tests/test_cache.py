@@ -92,6 +92,12 @@ def test_exists(cache):
     assert cache.exists("missing") is False
 
 
+def test_exists_with_none_value(cache):
+    cache.set("nullable", None)
+    assert cache.get("nullable") is None
+    assert cache.exists("nullable") is True
+
+
 def test_delete(cache):
     cache.set("k", "v")
     assert cache.delete("k") is True
@@ -106,6 +112,15 @@ def test_exists_after_expiry(cache):
     cache.set("k", "v", ttl=1)
     time.sleep(1.1)
     assert cache.exists("k") is False
+
+
+def test_l1_uses_lru_eviction():
+    cache = Cache(DB, max_size=2)
+    cache.set("a", 1)
+    cache.set("b", 2)
+    cache.get("a")
+    cache.set("c", 3)
+    assert list(cache._l1.keys()) == [("a", "default"), ("c", "default")]
 
 
 # ── Namespaces ───────────────────────────────────────────────────

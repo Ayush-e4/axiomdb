@@ -4,8 +4,8 @@
 
 <p align="center">
   <a href="https://github.com/Ayush-e4/axiomdb/actions/workflows/test.yml"><img src="https://github.com/Ayush-e4/axiomdb/actions/workflows/test.yml/badge.svg" alt="Tests"></a>
-  <a href="https://pypi.org/project/axiomdb-db/"><img src="https://img.shields.io/pypi/v/axiomdb-db?style=flat-square&color=f7971e&label=pypi" alt="PyPI"></a>
-  <a href="https://pypi.org/project/axiomdb-db/"><img src="https://img.shields.io/pypi/pyversions/axiomdb-db?style=flat-square&color=a8edea" alt="Python"></a>
+  <a href="https://pypi.org/project/axiomdb/"><img src="https://img.shields.io/pypi/v/axiomdb?style=flat-square&color=f7971e&label=pypi" alt="PyPI"></a>
+  <a href="https://pypi.org/project/axiomdb/"><img src="https://img.shields.io/pypi/pyversions/axiomdb?style=flat-square&color=a8edea" alt="Python"></a>
   <a href="https://github.com/Ayush-e4/axiomdb/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Ayush-e4/axiomdb?style=flat-square&color=fed6e3" alt="License"></a>
   <a href="https://github.com/Ayush-e4/axiomdb"><img src="https://img.shields.io/github/stars/Ayush-e4/axiomdb?style=flat-square&color=f9e2af" alt="Stars"></a>
 </p>
@@ -88,7 +88,7 @@ The standard answer? Spin up **Redis** + **Celery**. That's 2 extra services, Do
 ## 🚀 Quick Start
 
 ```bash
-pip install axiomdb-db
+pip install axiomdb
 ```
 
 > **Requirements:** Python 3.10+ · No external dependencies — just the standard library.
@@ -251,8 +251,8 @@ graph LR
 |---|---|
 | **WAL mode** | SQLite's write-ahead log enables concurrent reads while writing |
 | **L1 memory cache** | Hot keys are served from a Python dict — zero disk I/O |
-| **LRU eviction** | When L1 exceeds `max_size`, the oldest half is dropped |
-| **Atomic job claiming** | `SELECT` + `UPDATE` inside a Python lock — no two workers grab the same job |
+| **LRU eviction** | When L1 exceeds `max_size`, the least recently used keys are evicted first |
+| **Atomic job claiming** | A SQLite write transaction claims the next runnable job before any worker can execute it |
 | **Exponential backoff** | Failed jobs retry at `2^attempts` seconds (2s → 4s → 8s → …) |
 | **Watchdog thread** | Every 60s, resets jobs stuck in `running` for >5 min (crash recovery) |
 | **TTL cleanup** | Background thread purges expired cache keys every 5 min |

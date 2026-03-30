@@ -73,11 +73,14 @@ class Scheduler:
                         self.queue.enqueue(job["func"], job["payload"])
                         job["last_run"] = now
 
-                elif job["type"] == "daily":
-                    if dt.hour == job["hour"] and dt.minute == job["minute"]:
-                        minute_key = dt.hour * 60 + dt.minute
-                        if job["last_run"] != minute_key:
-                            self.queue.enqueue(job["func"], job["payload"])
-                            job["last_run"] = minute_key
+                elif (
+                    job["type"] == "daily"
+                    and dt.hour == job["hour"]
+                    and dt.minute == job["minute"]
+                ):
+                    minute_key = dt.hour * 60 + dt.minute
+                    if job["last_run"] != minute_key:
+                        self.queue.enqueue(job["func"], job["payload"])
+                        job["last_run"] = minute_key
 
             time.sleep(0.1)  # tight loop — CPU cost is negligible

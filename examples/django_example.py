@@ -25,7 +25,7 @@ queue = Queue("axiomdb.db")
 @task
 def send_welcome_email(payload):
     """Background task: send welcome email to new user."""
-    from django.core.mail import send_mail  # noqa: import inside task to avoid circular imports
+    from django.core.mail import send_mail
 
     send_mail(
         subject="Welcome!",
