@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0c29"/>
+      <stop offset="50%" style="stop-color:#302b63"/>
+      <stop offset="100%" style="stop-color:#24243e"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f7971e"/>
+      <stop offset="100%" style="stop-color:#ffd200"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#a8edea"/>
+      <stop offset="100%" style="stop-color:#fed6e3"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Grid pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+    </pattern>
+    <!-- Dot pattern -->
+    <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="0.5" fill="rgba(255,255,255,0.06)"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="300" rx="16" fill="url(#bg)"/>
+  <rect width="900" height="300" rx="16" fill="url(#grid)"/>
+  <rect width="900" height="300" rx="16" fill="url(#dots)"/>
+
+  <!-- Decorative orbs -->
+  <circle cx="150" cy="80" r="120" fill="rgba(167,119,227,0.06)" filter="url(#softGlow)"/>
+  <circle cx="750" cy="220" r="150" fill="rgba(247,151,30,0.05)" filter="url(#softGlow)"/>
+  <circle cx="450" cy="280" r="80" fill="rgba(168,237,234,0.04)" filter="url(#softGlow)"/>
+
+  <!-- Decorative lines -->
+  <line x1="60" y1="240" x2="840" y2="240" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+  <line x1="60" y1="242" x2="350" y2="242" stroke="url(#textGrad)" stroke-width="2" opacity="0.3"/>
+
+  <!-- SQLite icon representation -->
+  <g transform="translate(130, 110)" opacity="0.9">
+    <rect x="0" y="0" width="48" height="56" rx="6" fill="none" stroke="url(#accentGrad)" stroke-width="1.5" opacity="0.5"/>
+    <line x1="8" y1="16" x2="40" y2="16" stroke="rgba(168,237,234,0.3)" stroke-width="1"/>
+    <line x1="8" y1="26" x2="40" y2="26" stroke="rgba(168,237,234,0.3)" stroke-width="1"/>
+    <line x1="8" y1="36" x2="40" y2="36" stroke="rgba(168,237,234,0.3)" stroke-width="1"/>
+    <line x1="8" y1="46" x2="40" y2="46" stroke="rgba(168,237,234,0.3)" stroke-width="1"/>
+    <circle cx="14" cy="10" r="2" fill="rgba(247,151,30,0.6)"/>
+    <circle cx="22" cy="10" r="2" fill="rgba(168,237,234,0.6)"/>
+    <circle cx="30" cy="10" r="2" fill="rgba(254,214,227,0.6)"/>
+  </g>
+
+  <!-- Main title -->
+  <text x="200" y="155" font-family="'SF Mono', 'Fira Code', 'JetBrains Mono', monospace" font-size="72" font-weight="800" fill="url(#textGrad)" filter="url(#glow)" letter-spacing="-2">axiom</text>
+
+  <!-- Tagline -->
+  <text x="200" y="190" font-family="'Inter', 'SF Pro Display', -apple-system, sans-serif" font-size="17" fill="url(#accentGrad)" letter-spacing="0.5" opacity="0.9">Redis + Celery in a single SQLite file</text>
+
+  <!-- Feature pills -->
+  <g transform="translate(200, 210)">
+    <rect x="0" y="0" width="70" height="26" rx="13" fill="rgba(247,151,30,0.15)" stroke="rgba(247,151,30,0.3)" stroke-width="1"/>
+    <text x="35" y="17" font-family="'SF Mono', monospace" font-size="11" fill="#f7971e" text-anchor="middle">Cache</text>
+
+    <rect x="82" y="0" width="70" height="26" rx="13" fill="rgba(168,237,234,0.15)" stroke="rgba(168,237,234,0.3)" stroke-width="1"/>
+    <text x="117" y="17" font-family="'SF Mono', monospace" font-size="11" fill="#a8edea" text-anchor="middle">Queue</text>
+
+    <rect x="164" y="0" width="92" height="26" rx="13" fill="rgba(254,214,227,0.15)" stroke="rgba(254,214,227,0.3)" stroke-width="1"/>
+    <text x="210" y="17" font-family="'SF Mono', monospace" font-size="11" fill="#fed6e3" text-anchor="middle">Scheduler</text>
+
+    <rect x="268" y="0" width="58" height="26" rx="13" fill="rgba(120,120,255,0.15)" stroke="rgba(120,120,255,0.3)" stroke-width="1"/>
+    <text x="297" y="17" font-family="'SF Mono', monospace" font-size="11" fill="#9d9dff" text-anchor="middle">CLI</text>
+  </g>
+
+  <!-- Version badge -->
+  <g transform="translate(710, 120)">
+    <rect x="0" y="0" width="80" height="28" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+    <text x="40" y="18" font-family="'SF Mono', monospace" font-size="12" fill="rgba(255,255,255,0.7)" text-anchor="middle">v0.1.0</text>
+  </g>
+
+  <!-- Zero config badge -->
+  <g transform="translate(670, 160)">
+    <rect x="0" y="0" width="160" height="28" rx="14" fill="rgba(247,151,30,0.1)" stroke="rgba(247,151,30,0.2)" stroke-width="1"/>
+    <text x="80" y="18" font-family="'Inter', sans-serif" font-size="12" fill="rgba(247,151,30,0.8)" text-anchor="middle">⚡ zero servers</text>
+  </g>
+
+  <!-- Bottom info -->
+  <text x="60" y="268" font-family="'SF Mono', monospace" font-size="13" fill="rgba(255,255,255,0.35)">pip install axiom</text>
+  <text x="840" y="268" font-family="'SF Mono', monospace" font-size="13" fill="rgba(255,255,255,0.25)" text-anchor="end">MIT License</text>
+</svg>

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 520">
+  <defs>
+    <linearGradient id="termBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e1e2e"/>
+      <stop offset="100%" style="stop-color:#181825"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Terminal window -->
+  <rect width="850" height="520" rx="12" fill="url(#termBg)" stroke="#313244" stroke-width="1.5"/>
+
+  <!-- Title bar -->
+  <rect width="850" height="42" rx="12" fill="#1e1e2e"/>
+  <rect y="30" width="850" height="12" fill="#1e1e2e"/>
+  <line x1="0" y1="42" x2="850" y2="42" stroke="#313244" stroke-width="1"/>
+
+  <!-- Traffic lights -->
+  <circle cx="24" cy="21" r="7" fill="#f38ba8"/>
+  <circle cx="46" cy="21" r="7" fill="#f9e2af"/>
+  <circle cx="68" cy="21" r="7" fill="#a6e3a1"/>
+
+  <!-- Title text -->
+  <text x="425" y="27" font-family="'SF Mono','Fira Code',monospace" font-size="13" fill="#6c7086" text-anchor="middle">axiom — terminal</text>
+
+  <!-- Terminal content -->
+  <g font-family="'SF Mono','Fira Code','JetBrains Mono',monospace" font-size="14">
+
+    <!-- Command 1: stats -->
+    <text x="24" y="75">
+      <tspan fill="#a6e3a1">❯ </tspan>
+      <tspan fill="#cdd6f4">axiom --db app.db stats</tspan>
+    </text>
+
+    <text x="24" y="105" fill="#89b4fa" font-size="13">── Cache ──────────────────────────────</text>
+    <text x="24" y="127" fill="#cdd6f4" font-size="13">  default              <tspan fill="#a6e3a1">847</tspan> active  <tspan fill="#f9e2af">12</tspan> expired</text>
+    <text x="24" y="149" fill="#cdd6f4" font-size="13">  sessions             <tspan fill="#a6e3a1">234</tspan> active  <tspan fill="#f9e2af">0</tspan> expired</text>
+
+    <text x="24" y="179" fill="#89b4fa" font-size="13">── Queue ──────────────────────────────</text>
+    <text x="24" y="201" fill="#cdd6f4" font-size="13">  done         <tspan fill="#a6e3a1">1,247</tspan></text>
+    <text x="24" y="223" fill="#cdd6f4" font-size="13">  pending      <tspan fill="#f9e2af">3</tspan></text>
+    <text x="24" y="245" fill="#cdd6f4" font-size="13">  failed       <tspan fill="#f38ba8">1</tspan></text>
+
+    <!-- Command 2: inspect -->
+    <text x="24" y="285">
+      <tspan fill="#a6e3a1">❯ </tspan>
+      <tspan fill="#cdd6f4">axiom --db app.db inspect 42</tspan>
+    </text>
+
+    <text x="24" y="315" fill="#89b4fa" font-size="13">── Job #42 ────────────────────────────</text>
+    <text x="24" y="337" fill="#cdd6f4" font-size="13">  func      : <tspan fill="#cba6f7">myapp.tasks.send_welcome_email</tspan></text>
+    <text x="24" y="359" fill="#cdd6f4" font-size="13">  status    : <tspan fill="#a6e3a1">done</tspan></text>
+    <text x="24" y="381" fill="#cdd6f4" font-size="13">  priority  : <tspan fill="#f9e2af">10</tspan></text>
+    <text x="24" y="403" fill="#cdd6f4" font-size="13">  attempts  : <tspan fill="#cdd6f4">1 / 3</tspan></text>
+    <text x="24" y="425" fill="#cdd6f4" font-size="13">  payload   : <tspan fill="#f9e2af">{"email": "ayush@example.com"}</tspan></text>
+    <text x="24" y="447" fill="#cdd6f4" font-size="13">  created   : <tspan fill="#6c7086">2026-03-30 09:15:42</tspan></text>
+    <text x="24" y="469" fill="#cdd6f4" font-size="13">  updated   : <tspan fill="#6c7086">2026-03-30 09:15:43</tspan></text>
+
+    <!-- Prompt -->
+    <text x="24" y="505">
+      <tspan fill="#a6e3a1">❯ </tspan>
+      <tspan fill="#6c7086">_</tspan>
+    </text>
+
+  </g>
+</svg>
